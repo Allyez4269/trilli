@@ -1,0 +1,14 @@
+/bin/
+*.exe
+*.test
+*.out
+
+# qserve GeoIP database — fetched + auto-updated at runtime (~1.3GB)
+/data/
+
+# Editor / OS noise
+.DS_Store
+*.swp
+
+# Frontend deps
+interface/node_modules/

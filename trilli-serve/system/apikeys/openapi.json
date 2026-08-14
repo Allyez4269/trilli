@@ -1,0 +1,221 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Trilli API",
+    "version": "1.0.0",
+    "description": "Programmatic access to your Trilli account — list, upload, download, and organize files and folders. The API is a separate interface to the same account and obeys the same plan limits (storage, max file size, and monthly transfer). Available on plans that include API access (Plus and Infinity)."
+  },
+  "servers": [
+    { "url": "/api/v1", "description": "Trilli API v1 (relative to your Trilli host)" }
+  ],
+  "security": [{ "bearerAuth": [] }],
+  "tags": [
+    { "name": "Account", "description": "Account and plan information" },
+    { "name": "Files", "description": "Upload, download, list, and remove files" },
+    { "name": "Folders", "description": "List and create folders" }
+  ],
+  "paths": {
+    "/account": {
+      "get": {
+        "tags": ["Account"],
+        "summary": "Get account info",
+        "description": "Returns the account id, plan name, storage usage, and the plan's storage / max-file-size limits.",
+        "responses": {
+          "200": {
+            "description": "Account details",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Account" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/PlanForbidden" }
+        }
+      }
+    },
+    "/files": {
+      "get": {
+        "tags": ["Files"],
+        "summary": "List files",
+        "description": "Lists files directly inside a folder. Omit `folder_id` to list files at the account root.",
+        "parameters": [
+          { "name": "folder_id", "in": "query", "required": false, "schema": { "type": "integer", "format": "int64" }, "description": "Folder to list files in. Omit for the root." }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of files",
+            "content": { "application/json": { "schema": { "type": "object", "properties": { "files": { "type": "array", "items": { "$ref": "#/components/schemas/File" } } } } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/PlanForbidden" }
+        }
+      },
+      "post": {
+        "tags": ["Files"],
+        "summary": "Upload a file",
+        "description": "Uploads a file via multipart/form-data. Enforces the plan's max file size and storage quota, and meters ingress against the monthly transfer allowance.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                  "file": { "type": "string", "format": "binary", "description": "The file contents." },
+                  "folder_id": { "type": "integer", "format": "int64", "description": "Destination folder. Omit to upload to the root." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "The created file", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/File" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/PlanForbidden" },
+          "413": { "description": "File exceeds the plan's max file size", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "507": { "description": "Storage quota or monthly transfer limit exceeded", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/files/{id}": {
+      "get": {
+        "tags": ["Files"],
+        "summary": "Get file metadata",
+        "parameters": [{ "$ref": "#/components/parameters/FileId" }],
+        "responses": {
+          "200": { "description": "File metadata", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/File" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Files"],
+        "summary": "Move a file to trash",
+        "parameters": [{ "$ref": "#/components/parameters/FileId" }],
+        "responses": {
+          "204": { "description": "File moved to trash (no content)" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/files/{id}/content": {
+      "get": {
+        "tags": ["Files"],
+        "summary": "Download file contents",
+        "description": "Streams the raw file bytes. Egress is metered against the monthly transfer allowance.",
+        "parameters": [{ "$ref": "#/components/parameters/FileId" }],
+        "responses": {
+          "200": {
+            "description": "The file bytes",
+            "content": { "application/octet-stream": { "schema": { "type": "string", "format": "binary" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/folders": {
+      "get": {
+        "tags": ["Folders"],
+        "summary": "List folders",
+        "description": "Lists subfolders of a folder. Omit `parent_id` to list top-level folders.",
+        "parameters": [
+          { "name": "parent_id", "in": "query", "required": false, "schema": { "type": "integer", "format": "int64" }, "description": "Parent folder. Omit for top-level folders." }
+        ],
+        "responses": {
+          "200": { "description": "An array of folders", "content": { "application/json": { "schema": { "type": "object", "properties": { "folders": { "type": "array", "items": { "$ref": "#/components/schemas/Folder" } } } } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/PlanForbidden" }
+        }
+      },
+      "post": {
+        "tags": ["Folders"],
+        "summary": "Create a folder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string", "description": "Folder name." },
+                  "parent_id": { "type": "integer", "format": "int64", "description": "Parent folder. Omit to create at the root." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "The created folder", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Folder" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/PlanForbidden" },
+          "409": { "description": "A folder with that name already exists here", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Send your API key as a bearer token: `Authorization: Bearer trilli_sk_...`. Create keys on the API access page."
+      }
+    },
+    "parameters": {
+      "FileId": { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" }, "description": "File id." }
+    },
+    "responses": {
+      "Unauthorized": { "description": "Missing or invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "PlanForbidden": { "description": "API access is not included in this account's plan", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "NotFound": { "description": "Resource not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "BadRequest": { "description": "Invalid request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+    },
+    "schemas": {
+      "Account": {
+        "type": "object",
+        "properties": {
+          "account_id": { "type": "integer", "format": "int64" },
+          "plan": { "type": "string", "example": "Plus" },
+          "storage_bytes_used": { "type": "integer", "format": "int64" },
+          "max_storage_bytes": { "type": "integer", "format": "int64", "description": "Plan storage cap. A very large value (max int64) means unlimited." },
+          "max_file_size_bytes": { "type": "integer", "format": "int64", "description": "Plan per-file size cap. Max int64 means unlimited." }
+        }
+      },
+      "File": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "tenant_id": { "type": "integer", "format": "int64" },
+          "parent_folder_id": { "type": "integer", "format": "int64", "nullable": true },
+          "name": { "type": "string" },
+          "size_bytes": { "type": "integer", "format": "int64" },
+          "content_type": { "type": "string" },
+          "uploaded_by_user_id": { "type": "integer", "format": "int64" },
+          "status": { "type": "string", "example": "active" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Folder": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "tenant_id": { "type": "integer", "format": "int64" },
+          "parent_folder_id": { "type": "integer", "format": "int64", "nullable": true },
+          "name": { "type": "string" },
+          "created_by_user_id": { "type": "integer", "format": "int64" },
+          "status": { "type": "string", "example": "active" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": { "error": { "type": "string" } }
+      }
+    }
+  }
+}

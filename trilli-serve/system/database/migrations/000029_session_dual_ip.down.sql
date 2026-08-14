@@ -1,0 +1,3 @@
+ALTER TABLE sessions
+    DROP COLUMN IF EXISTS ip_v4,
+    DROP COLUMN IF EXISTS ip_v6;

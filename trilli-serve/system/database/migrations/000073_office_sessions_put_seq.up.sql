@@ -1,0 +1,12 @@
+-- Monotonic flush counter for office edit sessions.
+--
+-- The Productivity save handshake (client editor.save() + server SaveAs) needs
+-- to know when the engine's WOPI PutFile has landed so it commits the user's
+-- latest bytes — not the pre-edit ones. It used to detect this by watching
+-- size_bytes CHANGE, but the encrypted working blob's ciphertext length is a
+-- deterministic function of the plaintext length, so a subsequent save that
+-- doesn't change the document's byte length leaves size_bytes identical and the
+-- flush goes undetected (the first save always changes size, blank→content, so
+-- only subsequent same-size saves were affected). put_seq increments on EVERY
+-- PutFile, so a flush is detected regardless of whether the size changed.
+ALTER TABLE office_sessions ADD COLUMN put_seq BIGINT NOT NULL DEFAULT 0;

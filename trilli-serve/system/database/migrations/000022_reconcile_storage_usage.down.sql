@@ -1,0 +1,2 @@
+-- No-op: a storage-counter reconcile can't be meaningfully reversed (the prior
+-- drifted values aren't recoverable, nor would restoring them be desirable).

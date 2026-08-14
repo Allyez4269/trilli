@@ -1,0 +1,22 @@
+[Unit]
+Description=Trilli HTTP server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=trilli
+Group=trilli
+WorkingDirectory=/opt/trilli
+EnvironmentFile=/etc/trilli/trilli.env
+ExecStart=/opt/trilli/bin/trilli
+Restart=on-failure
+RestartSec=5s
+KillSignal=SIGTERM
+TimeoutStopSec=15s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=trilli
+
+[Install]
+WantedBy=multi-user.target

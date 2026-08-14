@@ -1,0 +1,2 @@
+ALTER TABLE files DROP COLUMN IF EXISTS access_count;
+ALTER TABLE files DROP COLUMN IF EXISTS tier_changed_at;

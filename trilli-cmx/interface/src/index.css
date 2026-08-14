@@ -1,0 +1,239 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * CMX theme — app.trilli.com's design system (SPEC §5.1), recolored.
+ *   base / canvas        -> --background = pure WHITE (#ffffff)  [CMX choice]
+ *   brand / primary      -> --primary = #565667 muted slate      [CMX choice]
+ *   accent / ring        -> #565667 (same as brand)              [CMX choice]
+ *   foreground / ink     -> navy #1a1f36   (unchanged from app)
+ *   muted / border / chrome / etc.                                (unchanged)
+ *
+ * #565667 ≈ oklch(0.46 0.02 290). primary-foreground stays white so button
+ * text is legible on the slate brand.
+ */
+@layer base {
+  :root {
+    /* Canvas — cool near-white (#f6f8fa), inherited from the design system so
+       white cards/the floating content shell "punch out" with real depth.
+       (A pure-white canvas would erase the float; the depth model needs a
+       faintly tinted canvas. Brand hues below stay CMX slate/navy.) */
+    --background: 0.985 0.004 255;
+    --foreground: 0.26 0.02 270;
+
+    --card: 1 0 0;
+    --card-foreground: 0.26 0.02 270;
+
+    --popover: 1 0 0;
+    --popover-foreground: 0.26 0.02 270;
+
+    /* Primary — CMX brand slate #565667. CTAs, active states, focus rings. */
+    --primary: 0.46 0.02 290;
+    --primary-foreground: 0.99 0 0;
+
+    /* Secondary — soft slate tint for lower-emphasis surfaces. */
+    --secondary: 0.95 0.006 290;
+    --secondary-foreground: 0.34 0.02 290;
+
+    /* Muted — cool light gray for hovers / ghost surfaces (unchanged). */
+    --muted: 0.96 0.006 255;
+    --muted-foreground: 0.5 0.02 265;
+
+    /* Accent — same slate as brand (SPEC §5.1). */
+    --accent: 0.46 0.02 290;
+    --accent-foreground: 0.99 0 0;
+
+    /* Destructive — notification red (unchanged). */
+    --destructive: 0.605 0.225 22;
+    --destructive-foreground: 0.99 0 0;
+
+    /* Lines + focus rings. --input is the input/select BORDER color: a visible
+       cool gray (≈ foreground/25) so every field has a clear 1px outline on the
+       white card, rather than the near-invisible hairline. */
+    --border: 0.92 0.008 255;
+    --input: 0.80 0.012 265;
+    --ring: 0.46 0.02 290;
+
+    --radius: 0.5rem;
+
+    /* Chrome — deep navy (unchanged from app). */
+    --chrome: 0.25 0.05 258;
+    --chrome-foreground: 0.97 0.01 255;
+
+    /* Sidebar — near-white body, slate primary + soft-slate hover surfaces. */
+    --sidebar: 0.99 0.002 290;
+    --sidebar-foreground: 0.26 0.02 270;
+    --sidebar-primary: 0.46 0.02 290;
+    --sidebar-primary-foreground: 0.99 0 0;
+    --sidebar-accent: 0.95 0.006 290;
+    --sidebar-accent-foreground: 0.32 0.02 290;
+    --sidebar-border: 0.93 0.007 255;
+    --sidebar-ring: 0.46 0.02 290;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family:
+      "Inter", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Branded text selection — a soft slate wash rather than the OS blue. */
+  ::selection {
+    background-color: oklch(0.46 0.02 290 / 0.18);
+  }
+
+  /* Quieter, thinner scrollbars so dense tables/panels read as one calm
+     surface instead of fighting chunky OS chrome. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.80 0.012 265) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: oklch(0.82 0.01 265);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(0.72 0.014 265);
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  /* Inputs/selects: smooth the focus transition and lend a faint inner depth so
+     fields read as recessed wells on the white card, paired with the visible
+     --input border. */
+  input,
+  select,
+  textarea {
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+}
+
+/* ─── Entrance animations ─────────────────────────────────────────────────────
+ * Used for dashboard card stagger, modal entrances, and list reveals.
+ * Easing: cubic-bezier(0.16, 1, 0.3, 1) = ease-out-quint. No bounce.
+ */
+@keyframes cmx-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cmx-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes cmx-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer utilities {
+  .animate-fade-up {
+    animation: cmx-fade-up 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .animate-fade-in {
+    animation: cmx-fade-in 0.2s ease-out both;
+  }
+  .animate-scale-in {
+    animation: cmx-scale-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Stagger delay helpers — pair with any animate-* above */
+  .stagger-0   { animation-delay: 0ms;   }
+  .stagger-50  { animation-delay: 50ms;  }
+  .stagger-100 { animation-delay: 100ms; }
+  .stagger-150 { animation-delay: 150ms; }
+  .stagger-200 { animation-delay: 200ms; }
+  .stagger-250 { animation-delay: 250ms; }
+  .stagger-300 { animation-delay: 300ms; }
+  .stagger-350 { animation-delay: 350ms; }
+  .stagger-400 { animation-delay: 400ms; }
+
+  /* Shimmer skeleton — used in DataState loading */
+  .skeleton {
+    @apply animate-pulse rounded bg-muted;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-in,
+  .animate-scale-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .skeleton {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Desktop density (design system §5): render the whole console at 90% scale on
+ * large screens so more operator data fits. Scoped to >=1024px so phones/tablets
+ * stay at 100%. Applied to `body` (not `:root`) so this min-width query keeps
+ * evaluating against the true viewport — no feedback loop — and to `zoom` (not a
+ * transform) so layout, scrollbars, and body-portaled overlays scale together.
+ *
+ * `zoom` scales rendering but NOT viewport units, so compensate every viewport-
+ * height utility by 1/0.9 to repaint back to a full screen and anchor the shell.
+ */
+@media (min-width: 1024px) {
+  body {
+    zoom: 0.9;
+  }
+  .h-screen {
+    height: calc(100vh / 0.9);
+  }
+  .min-h-screen {
+    min-height: calc(100vh / 0.9);
+  }
+
+  /*
+   * Radix overlays portal to <body> and position with a fixed translate that the
+   * body zoom would skew (~10% offset the further down/right the trigger sits).
+   * Counter the zoom on the popper wrapper so the translate lands true, then
+   * restore 0.9 density on the content. Anchored poppers only; centered modals
+   * are unaffected.
+   */
+  [data-radix-popper-content-wrapper] {
+    zoom: calc(1 / 0.9);
+  }
+  [data-radix-popper-content-wrapper] > * {
+    zoom: 0.9;
+  }
+}

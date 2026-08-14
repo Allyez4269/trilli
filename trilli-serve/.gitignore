@@ -1,0 +1,15 @@
+/bin/
+*.exe
+*.test
+*.out
+
+# Frontend build artifacts (rebuilt via `cd interface && npm run build`)
+/interface/node_modules/
+/interface/dist/
+
+# Local-disk blob store (dev backend; will be swapped for Azure Blob)
+/data/
+
+# Editor / OS noise
+.DS_Store
+*.swp

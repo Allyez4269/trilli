@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="120 110 480 480" role="img" aria-label="trilli mark">
+<title>trilli mark</title>
+<g fill="currentColor">
+<path d="M 360 350 L 120 350 A 120 120 0 0 1 360 350 Z"/>
+<path d="M 360 350 L 360 110 A 120 120 0 0 1 360 350 Z"/>
+<path d="M 360 350 L 600 350 A 120 120 0 0 1 360 350 Z"/>
+<path d="M 360 350 L 360 590 A 120 120 0 0 1 360 350 Z"/>
+</g>
+</svg>

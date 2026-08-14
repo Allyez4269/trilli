@@ -1,0 +1,2 @@
+DROP INDEX IF EXISTS sessions_ref_uq;
+ALTER TABLE sessions DROP COLUMN IF EXISTS ref;

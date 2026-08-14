@@ -1,0 +1,1 @@
+ALTER TABLE tenants DROP COLUMN IF EXISTS auto_renew;

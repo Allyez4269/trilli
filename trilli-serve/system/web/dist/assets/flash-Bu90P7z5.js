@@ -1,0 +1,1 @@
+function t(){const e=document.cookie.match(/(?:^|;\s*)trilli_flash=([^;]*)/);if(!e)return null;document.cookie="trilli_flash=; Path=/; Max-Age=0; SameSite=Lax";try{return decodeURIComponent(e[1].replace(/\+/g,"%20"))}catch{return e[1]}}export{t as r};
