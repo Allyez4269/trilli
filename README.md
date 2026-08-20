@@ -10,6 +10,19 @@ blob store, and a React frontend embedded right into the executable.
 
 It powers [trilli.com](https://trilli.com) in production. Today it's yours.
 
+![The Files browser](docs/screenshots/files.png)
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/home.png" alt="Home dashboard with quick stats and activity"></td>
+    <td><img src="docs/screenshots/sign-editor.png" alt="Trilli Sign field editor"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/pdf-tools.png" alt="Trilli PDF tool suite"></td>
+    <td><img src="docs/screenshots/sign.png" alt="Trilli Sign envelope dashboard"></td>
+  </tr>
+</table>
+
 ## What's inside
 
 | | |
